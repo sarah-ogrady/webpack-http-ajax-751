@@ -1,55 +1,26 @@
 console.log("Hello from src/index.js!");
 
-// BUTTON RECAP
-// const button = document.querySelector("#click-me");
+// Imports
+import { fetchMovies, fillList } from "./movie";
+import { initSortable } from "./plugins/init_sortablejs";
+import { initSelect2 } from "./plugins/init_select2";
+import { Application } from "stimulus"
+import { definitionsFromContext } from "stimulus/webpack-helpers"
 
-// button.addEventListener('click', (event) => {
-//   // console.log(event.currentTarget.innerText);
-//   event.currentTarget.innerText = "Please wait.."
-//   event.currentTarget.disabled = true
-// })
+// Stimulus setup
+const application = Application.start();
+const context = require.context("./controllers", true, /\.js$/);
+application.load(definitionsFromContext(context));
 
-// MOVIE SEARCH
-const results = document.getElementById("results");
+// Selections
 const searchForm = document.getElementById("search-movies");
 
-const searchMovies = (apple) => {
-  const url = `http://www.omdbapi.com/?s=${apple}&apikey=adf1f2d7`;
-  fetch(url)
-    .then(response => response.json())
-    .then((data) => {
-      // console.log(data.Search);
-      data.Search.forEach((movie) => {
-        const newMovie = `<li>
-        <img src="${movie.Poster}">
-        <p>${movie.Title}</p>
-        </li>`
-        results.insertAdjacentHTML('beforeend', newMovie)
-      })
-    });
-};
+// Listeners
+searchForm.addEventListener("submit", fillList);
 
-searchForm.addEventListener("submit", (event) => {
-  results.innerHTML = "";
-  event.preventDefault();
-  const keyword = document.getElementById("keyword");
-  // console.log(keyword.value);
-  searchMovies(keyword.value);
-});
+// Api calls
+fetchMovies("Indiana Jones");
 
-// searchMovies("Indiana Jones");
-
-// ALGOLIA PLACES
-// const searchAlgoliaPlaces = (event) => {
-//   fetch("https://places-dsn.algolia.net/1/places/query", {
-//     method: "POST",
-//     body: JSON.stringify({ query: event.currentTarget.value })
-//   })
-//     .then(response => response.json())
-//     .then((data) => {
-//       console.log(data.hits); // Look at local_names.default
-//     });
-// };
-
-// const input = document.querySelector("#search");
-// input.addEventListener("keyup", searchAlgoliaPlaces);
+// Plugins
+initSortable();
+initSelect2();
